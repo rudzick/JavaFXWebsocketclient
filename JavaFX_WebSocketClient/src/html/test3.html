@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de-de" style="height:100%;width:100%;margin:0;padding:0">
+
+<!--
+Based on http://wiki.openstreetmap.org/wiki/DE:Karte_in_Webseite_einbinden
+-->
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="content-script-type" content="text/javascript" />
+  <meta http-equiv="content-style-type" content="text/css" />
+  <meta http-equiv="content-language" content="de">
+  <!--
+  <link rel="stylesheet" type="text/css" href="../css/gm.css">
+  -->
+<!--
+  <script type="text/javascript" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+   -->
+  <script type="text/javascript" src="../ol/OpenLayers.js"></script> 
+  <!--
+  <script type="text/javascript" src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+  -->
+  <script type="text/javascript" src="../ol/OpenStreetMap.js"></script>
+  
+<script type="text/javascript">
+
+var karte;
+var markers = null;
+
+ function osm_byg() {
+  
+  var options = {
+	projection: new OpenLayers.Projection("EPSG:3587"),
+    displayProjection: new OpenLayers.Projection("EPSG:4326"),
+    units: "m",
+    maxResolution: 156543.03390625,
+    maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
+    allOverlays: false
+    //    panMethod: OpenLayers.Easing.Quad.linearOut,
+    //    panDuration: 20000
+  };
+  
+  
+  
+  karte = new OpenLayers.Map('karte', options);
+  
+  // Vermeiden von rosa Tiles
+  OpenLayers.IMAGE_RELOAD_ATTEMPTS = 10;
+  OpenLayers.Util.onImageLoadErrorColor = "red"; 
+    
+  var osm_mapnik = new OpenLayers.Layer.OSM.Mapnik(
+						   "OpenStreetMap (Mapnik)",
+						   {
+						   identifier: "osm_mapnik",
+						       numZoomLevels: 22
+						       }
+						   );
+  osm_mapnik.id = "osm_mapnik";
+
+  
+  var osm_cyclemap = new OpenLayers.Layer.OSM.CycleMap(
+						       "OpenStreetMap (Cyclemap)",
+						       {
+						       identifier: "osm_cyclemap",
+							   numZoomLevels: 22,
+							   visibility: false}
+						       );
+  osm_cyclemap.id = "osm_cyclemap";
+
+  var osm_transportmap = new OpenLayers.Layer.OSM.TransportMap(
+						       "OSM (Transport Map)",
+						       {
+						       identifier: "osm_transportmap",
+							   numZoomLevels: 22,
+							   visibility: false}
+						       );
+  osm_transportmap.id = "osm_transportmap";
+
+  karte.addLayers([osm_mapnik, osm_cyclemap, osm_transportmap]);
+ 
+  karte.addControl(new OpenLayers.Control.LayerSwitcher({'ascending':true}));
+  karte.addControl(new OpenLayers.Control.Navigation(
+							     {dragPanOptions: {interval: 100, enableKinetic: true}}
+							     ));
+  karte.addControl(new OpenLayers.Control.Permalink('permalink')); 
+}
+
+
+
+
+function jumpTo(lon, lat, zoom)
+{
+    var x = Lon2Merc(lon);
+    var y = Lat2Merc(lat);
+    
+    if (markers === null) {
+    	markers = new OpenLayers.Layer.Markers("Markers");
+    	karte.addLayer(markers);
+    	}	
+    
+    markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(x, y)));
+    
+    karte.setCenter(new OpenLayers.LonLat(x, y), zoom);
+    return false;
+}
+
+function Lon2Merc(lon)
+{
+    return 20037508.34 * lon / 180;
+}
+function Lat2Merc(lat)
+{
+    var PI = 3.14159265358979323846;
+    lat = Math.log(Math.tan( (90 + lat) * PI / 360)) / (PI / 180);
+    return 20037508.34 * lat / 180;
+}
+
+function init() {
+	
+ osm_byg(); 
+
+  karte.setCenter((new OpenLayers.LonLat(12.76199, 52.47316)).transform(new OpenLayers.Projection('EPSG:4326'), new OpenLayers.Projection('EPSG:900913')), 11);
+
+}
+
+function reset() {
+
+	// Marker löschen
+	karte.removeLayer(markers);
+	markers = null;
+
+	karte.setCenter((new OpenLayers.LonLat(12.76199, 52.47316)).transform(new OpenLayers.Projection('EPSG:4326'), new OpenLayers.Projection('EPSG:900913')), 11);
+}
+
+</script>
+
+</head>
+<body onload="init()" topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0" style="height:100%;width:100%;margin:0;padding:0">
+  <h3 id="ueberschr" >OpenLayers-Karte mit JavaFX</h3>
+  <div id="karte" style="height:100%;width:100%;border:2px solid black;">
+  </div>
+  <div id="photo_info_wrapper"></div>
+</body>
+</html>

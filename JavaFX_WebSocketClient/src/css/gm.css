@@ -1,0 +1,48 @@
+.olControlLayerSwitcher {
+/* color: white;
+background: #546e76; */
+color: black;
+background: white;
+/* font-weight: bold; */
+position: absolute;
+top: 25px;
+right: 18px; 
+}
+
+/*
+.olControlScaleLine {
+ color: white;
+background: #546e76; 
+ color: black;
+background: white;
+ font-weight: bold; 
+position: absolute;
+bottom: 40px;
+left: 100px; 
+} */
+
+#kartenmasstab {
+color:  #546e76;
+/* color: black;
+background: white;
+ font-weight: bold; */
+/*position: absolute;
+bottom: 40px;
+left: 100px; */
+}
+
+
+#kartenmasstab .olControlScaleLine {
+width: 200px; 
+}
+
+.olLayerGooglePoweredBy {
+position: absolute;
+bottom: 0px;
+}
+
+.olLayerGoogleCopyright { 
+position: absolute;
+bottom: 0px;
+right: 10px;
+}
